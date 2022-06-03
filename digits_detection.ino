@@ -69,7 +69,7 @@ int run_model() {
         if (result < output->data.uint8[i])
             result = output->data.uint8[i];
 
-    return;
+    return result;
 }
 
 
