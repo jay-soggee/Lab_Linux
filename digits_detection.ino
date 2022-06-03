@@ -1,3 +1,5 @@
+//#define DEBUG
+
 #include <TensorFlowLite.h>
 
 #include "tensorflow/lite/micro/all_ops_resolver.h"
@@ -50,8 +52,30 @@ void setup() {
 }
 
 
+int run_model() {
+    int result;
+
+    if (kTfLiteOk != GetImage(error_reporter, kNumCols, kNumRows, kNumChannels, input->data.int8)) {
+        TF_LITE_REPORT_ERROR(error_reporter, "Image capture failed.");
+    }
+
+    if (kTfLiteOk != interpreter->Invoke()) {
+        TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
+    }
+    
+    TfLiteTensor* output = interpreter->output(0);
+
+    for (int i; i < 10; i++) 
+        if (result < output->data.uint8[i])
+            result = output->data.uint8[i];
+
+    return;
+}
+
+
 void loop() {
 
+#ifdef DEBUG
     if (kTfLiteOk != GetImage(error_reporter, kNumCols, kNumRows, kNumChannels, input->data.int8)) {
         TF_LITE_REPORT_ERROR(error_reporter, "Image capture failed.");
     }
@@ -75,4 +99,7 @@ void loop() {
         output->data.uint8[8],
         output->data.uint8[9]
     );
+#endif
+
+
 }
