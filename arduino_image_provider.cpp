@@ -78,6 +78,7 @@ TfLiteStatus InitCamera(tflite::ErrorReporter* error_reporter) {
   digitalWrite(CS, HIGH);
   // initialize SPI
   SPI.begin();
+  SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
   // Reset the CPLD
   myCAM.write_reg(0x07, 0x80);
   delay(100);
