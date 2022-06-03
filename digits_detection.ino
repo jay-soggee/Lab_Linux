@@ -49,6 +49,7 @@ void setup() {
     input = interpreter->input(0);
 }
 
+
 void loop() {
 
     if (kTfLiteOk != GetImage(error_reporter, kNumCols, kNumRows, kNumChannels, input->data.int8)) {
