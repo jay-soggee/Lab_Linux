@@ -13,17 +13,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "model_settings.h"
+#ifndef TENSORFLOW_LITE_MICRO_EXAMPLES_PERSON_DETECTION_ARDUINO_HM01B0_PLATFORM_H_
+#define TENSORFLOW_LITE_MICRO_EXAMPLES_PERSON_DETECTION_ARDUINO_HM01B0_PLATFORM_H_
 
-const char* kCategoryLabels[kCategoryCount] = {
-    "0",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9"
-};
+#if defined(ARDUINO) && defined(ARDUINO_SFE_EDGE)
+#include "hm01b0_platform_edge.h"
+#define HM01B0_PIN_TRIG 0  // unused
+#define HM01B0_PIN_INT 0   // unused
+#endif                     // defined(ARDUINO) && defined(ARDUINO_SFE_EDGE)
+
+#endif  // TENSORFLOW_LITE_MICRO_EXAMPLES_PERSON_DETECTION_ARDUINO_HM01B0_PLATFORM_H_
