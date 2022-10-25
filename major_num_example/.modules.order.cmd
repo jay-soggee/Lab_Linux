@@ -1,0 +1,1 @@
+cmd_/home/sky/working/Lab_Linux/major_num_example/modules.order := {   echo /home/sky/working/Lab_Linux/major_num_example/dev_nr.ko; :; } | awk '!x[$$0]++' - > /home/sky/working/Lab_Linux/major_num_example/modules.order

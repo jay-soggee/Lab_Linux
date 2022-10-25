@@ -1,0 +1,1 @@
+cmd_/home/sky/working/Lab_Linux/led_button_example/gpio_driver.mod := { echo  /home/sky/working/Lab_Linux/led_button_example/gpio_driver.o;  echo; } > /home/sky/working/Lab_Linux/led_button_example/gpio_driver.mod
