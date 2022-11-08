@@ -181,7 +181,7 @@ static int __init ModuleInit(void) {
 
 	/* GPIO 2 init */
 	if(gpio_request(2, "rpi-gpio-2")) {
-		printk("Can not allocate GPIO 4\n");
+		printk("Can not allocate GPIO 2\n");
 		goto AddError;
 	}
 
@@ -193,7 +193,7 @@ static int __init ModuleInit(void) {
 
 	/* GPIO 3 init */
 	if(gpio_request(3, "rpi-gpio-3")) {
-		printk("Can not allocate GPIO 4\n");
+		printk("Can not allocate GPIO 3\n");
 		goto AddError;
 	}
 

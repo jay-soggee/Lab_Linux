@@ -5,8 +5,8 @@
 
 int main() {
 
-    char buff;
-    char tmp;
+    char buff[2];
+    char tmp1, tmp2;
     char prev = 'r';
 
 	int dev = open("/dev/mygpio", O_RDWR);
@@ -17,7 +17,9 @@ int main() {
 	printf("Opening was successfull!\n");
 
     while(1) {
-        read(dev, &buff, 1);
+        read(dev, &buff, 2);
+        tmp1 = buff[0];
+        tmp2 = buff[1];
         prev = tmp;
         tmp = buff;
         write(dev, &tmp, 1);

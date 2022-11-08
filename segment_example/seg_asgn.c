@@ -1,0 +1,150 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+
+#define D1 0x01
+#define D2 0x02
+#define D3 0x04
+#define D4 0x08
+
+#define COUNT_UP(num) num = (num + 1) % 10000
+#define COUNT_DOWN(num) num = (num - 1) % 10000
+
+char seg_num[10] = {0xc0, 0xf9, 0xa4, 0xb0, 0x99, 0x92, 0x82, 0xd8, 0x80, 0x90};
+char seg_dnum[10] = {0x40, 0x79, 0x24, 0x30, 0x19, 0x12, 0x02, 0x58, 0x00, 0x10};
+
+static struct termios init_setting, new_setting;
+
+void init_keyboard(){
+    tcgetattr(STDIN_FILNO, &init_setting);
+    new_setting = init_setting;
+    new_setting.c_lflag &= ~ICANON;
+    new_setting.c_lflag &= ~ECHO;
+    new_setting.c_cc[VMIN] = 0;
+    new_setting.c_cc[VTIME] = 0;
+    tcsetattr(0, TCSANOW, &new_setting);
+}
+
+void close_keyboard(){
+    tcsetattr(0, TCSANOW, &init_setting);
+}
+
+char get_key(){
+    char ch = -1;
+
+    if(read(STDIN_FILENO, &ch, 1) != 1)  ch = -1;      
+    return ch;
+}
+
+int SetSegKeyboard(){
+    char string[4];
+    int num;
+    char num1,num2,num3,num4;
+
+    if(read(STDIN_FILENO, &string, 4) != 1)  return -1;
+    num1 = string[0] - '0';
+    num2 = string[1] - '0';
+    num3 = string[2] - '0';
+    num4 = string[3] - '0';
+
+    num = int(num4 + 10 * num3 + 100 * num2 + 1000 * num1);
+    return num;
+}
+
+void print_menu(){
+    printf("\n-----------------------------\n\n");
+    printf("[u] : Count UP\n");
+    printf("[d] : Count DOWN\n");
+    printf("[s] : Count SETTING\n");
+    printf("[q] : Program Quit\n");
+    printf("\n-----------------------------\n\n");
+}
+
+int seg_write(int dev, int num) {
+    if (num > 9999 || num < 0) return -1;
+
+    unsigned short data[4];
+    static int tmp_n = 0;
+
+    data[0] = (seg_num[num / 1000]          << 4) | D1;
+    data[1] = (seg_num[(num % 1000) / 100]  << 4) | D2;
+    data[2] = (seg_num[(num % 100) / 10]    << 4) | D3;
+    data[3] = (seg_num[num % 10]            << 4) | D4;
+
+    delay_time = 10;
+    write(dev, &data[tmp_n], 2);
+    usleep(delay_time);
+
+    tmp_n = (tmp_n + 1) % 4;
+
+    return 0;
+}
+
+
+
+int main() {
+
+    char buff[2];
+    char tmp1, tmp2;
+    char prev1 = 'r';
+    char prev2 = 'r';
+
+    int dev_g = open("/dev/my_gpio", O_RDWR);
+    if(dev_g == -1) {
+        printf("Opening gpio was not possible!\n");
+        return -1;
+    }
+    printf("Opening gpio was successfull!\n");
+
+    int dev_s = open("/dev/my_segment", O_RDWR);
+    if(dev_s == -1){
+        printf("Opening segment was not Possible!\n");
+        return -1;
+    }
+    printf("Device Opening segment was Successful!\n");
+
+
+    init_keyboard();
+    print_menu();
+
+    while(1) {
+        // keyboard
+        key = get_key();
+        if(key == 'q'){
+            printf("Exit this Program. \n");
+            break;
+        }
+        else if (key == 'u'){
+            COUNT_UP(num); 
+
+        }
+        else if (key == 'd'){
+            COUNT_DOWN(num); 
+        }
+        else if (key == 's'){
+            printf("Setting Seg Number\n");
+            num = SetSegKeyboard();
+        }
+
+        // button
+        read(dev_g, &buff, 2);
+        prev1 = tmp1;
+        prev2 = tmp2;
+        tmp1 = buff[1];
+        tmp2 = buff[2];
+        if (prev1 != tmp1) COUNT_UP(num);
+        if (prev2 != tmp2) COUNT_DOWN(num);
+
+        // 7-segment
+        seg_write(dev_s, num);
+    }
+
+    close_keyboard();
+
+    close(dev_g);
+    close(dev_s);
+    return 0;
+}
