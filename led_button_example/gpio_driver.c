@@ -30,7 +30,8 @@ static ssize_t driver_read(struct file *File, char *user_buffer, size_t count, l
 
 	/* Read value of button */
 	printk("Value of button: %d\n", gpio_get_value(17));
-	tmp[0] = gpio_get_value(17) + '0';
+	tmp[0] = gpio_get_value(5) + '0';
+	tmp[1] = gpio_get_value(6) + '0';
 
 	/* Copy data to user */
 	not_copied = copy_to_user(user_buffer, &tmp, to_copy);
@@ -41,37 +42,6 @@ static ssize_t driver_read(struct file *File, char *user_buffer, size_t count, l
 	return delta;
 }
 
-/**
- * @brief Write data to buffer
- */
-static ssize_t driver_write(struct file *File, const char *user_buffer, size_t count, loff_t *offs) {
-	int to_copy, not_copied, delta;
-	char value;
-
-	/* Get amount of data to copy */
-	to_copy = min(count, sizeof(value));
-
-	/* Copy data to user */
-	not_copied = copy_from_user(&value, user_buffer, to_copy);
-
-	/* Setting the LED */
-	switch(value) {
-		case '0':
-			gpio_set_value(4, 0);
-			break;
-		case '1':
-			gpio_set_value(4, 1);
-			break;
-		default:
-			printk("Invalid Input!\n");
-			break;
-	}
-
-	/* Calculate data */
-	delta = to_copy - not_copied;
-
-	return delta;
-}
 
 /**
  * @brief This function is called, when the device file is opened
@@ -94,7 +64,7 @@ static struct file_operations fops = {
 	.open = driver_open,
 	.release = driver_close,
 	.read = driver_read,
-	.write = driver_write
+	//.write = driver_write
 };
 
 /**
@@ -131,36 +101,35 @@ static int __init ModuleInit(void) {
 		goto AddError;
 	}
 
-	/* GPIO 4 init */
-	if(gpio_request(4, "rpi-gpio-4")) {
-		printk("Can not allocate GPIO 4\n");
+	/* GPIO 5 init */
+	if(gpio_request(5, "rpi-gpio-5")) {
+		printk("Can not allocate GPIO 5\n");
 		goto AddError;
 	}
 
-	/* Set GPIO 4 direction */
-	if(gpio_direction_output(4, 0)) {
-		printk("Can not set GPIO 4 to output!\n");
-		goto Gpio4Error;
+	/* Set GPIO 5 direction */
+	if(gpio_direction_input(5)) {
+		printk("Can not set GPIO 5 to input!\n");
+		goto Gpio5Error;
 	}
 
-	/* GPIO 17 init */
-	if(gpio_request(17, "rpi-gpio-17")) {
-		printk("Can not allocate GPIO 17\n");
-		goto Gpio4Error;
+	/* GPIO 6 init */
+	if(gpio_request(6, "rpi-gpio-6")) {
+		printk("Can not allocate GPIO 6\n");
+		goto Gpio5Error;
 	}
 
-	/* Set GPIO 17 direction */
-	if(gpio_direction_input(17)) {
-		printk("Can not set GPIO 17 to input!\n");
-		goto Gpio17Error;
+	/* Set GPIO 6 direction */
+	if(gpio_direction_input(6)) {
+		printk("Can not set GPIO 6 to input!\n");
+		goto Gpio6Error;
 	}
-
 
 	return 0;
-Gpio17Error:
-	gpio_free(17);
-Gpio4Error:
-	gpio_free(4);
+Gpio6Error:
+	gpio_free(6);
+Gpio5Error:
+	gpio_free(5);
 AddError:
 	device_destroy(my_class, my_device_nr);
 FileError:
@@ -175,8 +144,8 @@ ClassError:
  */
 static void __exit ModuleExit(void) {
 	gpio_set_value(4, 0);
-	gpio_free(17);
-	gpio_free(4);
+	gpio_free(6);
+	gpio_free(5);
 	cdev_del(&my_device);
 	device_destroy(my_class, my_device_nr);
 	class_destroy(my_class);
