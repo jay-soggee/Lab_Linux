@@ -10,8 +10,9 @@
 #define D3 0x04
 #define D4 0x08
 
-#define COUNT_UP(num) num = (num + 1) % 10000
-#define COUNT_DOWN(num) num = (num - 1) % 10000
+#define COUNT_UP(num) if(++num>9999) num = 0
+
+#define COUNT_DOWN(num) if(--num<0) num = 9999
 
 char seg_num[10] = {0xc0, 0xf9, 0xa4, 0xb0, 0x99, 0x92, 0x82, 0xd8, 0x80, 0x90};
 char seg_dnum[10] = {0x40, 0x79, 0x24, 0x30, 0x19, 0x12, 0x02, 0x58, 0x00, 0x10};
@@ -19,7 +20,7 @@ char seg_dnum[10] = {0x40, 0x79, 0x24, 0x30, 0x19, 0x12, 0x02, 0x58, 0x00, 0x10}
 static struct termios init_setting, new_setting;
 
 void init_keyboard(){
-    tcgetattr(STDIN_FILNO, &init_setting);
+    tcgetattr(STDIN_FILENO, &init_setting);
     new_setting = init_setting;
     new_setting.c_lflag &= ~ICANON;
     new_setting.c_lflag &= ~ECHO;
@@ -40,18 +41,18 @@ char get_key(){
 }
 
 int SetSegKeyboard(){
-    char string[4];
-    int num;
-    char num1,num2,num3,num4;
+    int res = 0;
+    int num[4] = { 0,};
+    int cnt = 0;
 
-    if(read(STDIN_FILENO, &string, 4) != 1)  return -1;
-    num1 = string[0] - '0';
-    num2 = string[1] - '0';
-    num3 = string[2] - '0';
-    num4 = string[3] - '0';
-
-    num = int(num4 + 10 * num3 + 100 * num2 + 1000 * num1);
-    return num;
+    char key = 0;
+    while((key = get_key()) != '\n'){
+    	if(key != -1){
+		num[cnt++] = key - '0';
+	}
+    }
+    res = (int)(num[3] + 10*num[2] + 100*num[1] + 1000*num[0]);
+    return res;
 }
 
 void print_menu(){
@@ -68,6 +69,7 @@ int seg_write(int dev, int num) {
 
     unsigned short data[4];
     static int tmp_n = 0;
+    int delay_time;
 
     data[0] = (seg_num[num / 1000]          << 4) | D1;
     data[1] = (seg_num[(num % 1000) / 100]  << 4) | D2;
@@ -86,13 +88,15 @@ int seg_write(int dev, int num) {
 
 
 int main() {
-
-    char buff[2];
+    char key;
+    char buff[3];
     char tmp1, tmp2;
     char prev1 = 'r';
     char prev2 = 'r';
+    
+    int num = 0;
 
-    int dev_g = open("/dev/my_gpio", O_RDWR);
+    int dev_g = open("/dev/my_gpio_driver", O_RDWR);
     if(dev_g == -1) {
         printf("Opening gpio was not possible!\n");
         return -1;
@@ -125,16 +129,15 @@ int main() {
             COUNT_DOWN(num); 
         }
         else if (key == 's'){
-            printf("Setting Seg Number\n");
             num = SetSegKeyboard();
         }
 
         // button
-        read(dev_g, &buff, 2);
+        read(dev_g, &buff, 3);
         prev1 = tmp1;
         prev2 = tmp2;
-        tmp1 = buff[1];
-        tmp2 = buff[2];
+        tmp1 = buff[0];
+        tmp2 = buff[1];
         if (prev1 != tmp1) COUNT_UP(num);
         if (prev2 != tmp2) COUNT_DOWN(num);
 

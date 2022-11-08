@@ -1,7 +1,7 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/fs.h>
-#include <lunux/cdev.h>
+#include <linux/cdev.h>
 #include <linux/uaccess.h>
 #include <linux/gpio.h>
 
@@ -15,8 +15,8 @@ static dev_t my_device_nr;
 static struct class* my_class;
 static struct cdev my_device;
 
-#define DRIVER_NAME "my_segment";
-#define DRIVER_CLASS "MyModuleClass_seg";
+#define DRIVER_NAME "my_segment"
+#define DRIVER_CLASS "MyModuleClass_seg"
 
 /**
  * @brief Write data to buffer

@@ -1,0 +1,1 @@
+cmd_/home/sky/working/segHW/Lab_Linux/segment_example/modules.order := {   echo /home/sky/working/segHW/Lab_Linux/segment_example/gpio_driver.ko;   echo /home/sky/working/segHW/Lab_Linux/segment_example/segment_driver.ko; :; } | awk '!x[$$0]++' - > /home/sky/working/segHW/Lab_Linux/segment_example/modules.order
