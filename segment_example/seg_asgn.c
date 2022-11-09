@@ -26,7 +26,7 @@ void init_keyboard(){
     new_setting.c_lflag &= ~ECHO;
     new_setting.c_cc[VMIN] = 0;
     new_setting.c_cc[VTIME] = 0;
-    tcsetattr(0, TCSANOW, &init_setting);
+    tcsetattr(0, TCSANOW, &new_setting);
 }
 
 void close_keyboard(){
@@ -41,9 +41,11 @@ char get_key(){
 }
 
 int SetSegKeyboard(){
+    tcsetattr(0, TCSANOW, &init_setting);
     char buff[5] = "    \0";
     if(read(STDIN_FILENO, &buff, 4) != 4) return -1;
     printf("Set count to %s\n", buff);
+    tcsetattr(0, TCSANOW, &new_setting);
     return (buff[3] - '0') + 10 * (buff[2] - '0') + 100 * (buff[1] - '0') + 1000 * (buff[0] - '0');
 }
 
