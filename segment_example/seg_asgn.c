@@ -41,11 +41,19 @@ char get_key(){
 }
 
 int SetSegKeyboard(){
+<<<<<<< HEAD
     tcsetattr(0, TCSANOW, &init_setting);
     char buff[5] = "    \0";
     if(read(STDIN_FILENO, &buff, 4) != 4) return -1;
     printf("Set count to %s\n", buff);
     tcsetattr(0, TCSANOW, &new_setting);
+=======
+    tcsetattr(0,TCSANOW,&init_setting);
+    char buff[5] = "    \0";
+    if(read(STDIN_FILENO, &buff, 4) != 4) return -1;
+    printf("Set count to %s\n", buff);
+    tcsetattr(0,TCSANOW,&new_setting);
+>>>>>>> fd3d495 (7-segment controll assignment complete)
     return (buff[3] - '0') + 10 * (buff[2] - '0') + 100 * (buff[1] - '0') + 1000 * (buff[0] - '0');
 }
 
