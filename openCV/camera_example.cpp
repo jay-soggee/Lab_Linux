@@ -1,8 +1,8 @@
-#include <iostram>
+#include <iostream>
 #include <stdio.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/hpp>
+#include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/photo.hpp>
@@ -22,14 +22,14 @@ int main(int argc, char** argv)
     int frame_width = cap.get(CAP_PROP_FRAME_WIDTH);
     int frame_height = cap.get(CAP_PROP_FRAME_HEIGHT);
 
-    VideoWriter video("outcpp.avi", VideoWriter::foutcc('M','J','P','G'), 10, Size(frame_width,frame_height));
+    VideoWriter video("outcpp.avi", VideoWriter::fourcc('M','J','P','G'), 10, Size(frame_width,frame_height));
 
     printf("Open Camera\n");
     Mat img;
     int count = 0; int max;
     
     if (argc > 1) {
-        max = imt(argv[1]);
+        max = int(argv[1]);
     } else {
         max = 50;
     }
