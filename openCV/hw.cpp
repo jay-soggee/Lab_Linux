@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     int frame_width = cap.get(CAP_PROP_FRAME_WIDTH);
     int frame_height = cap.get(CAP_PROP_FRAME_HEIGHT);
 
-    VideoWriter video("outcpp.avi", VideoWriter::fourcc('M','J','P','G'), 10, Size(frame_width,frame_height));
+    VideoWriter video("outcpp.avi", VideoWriter::fourcc('X','2','6','4'), 10, Size(frame_width,frame_height));
 
     printf("Open Camera\n");
     Mat img;

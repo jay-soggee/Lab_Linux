@@ -1,5 +1,5 @@
 RESULT0	= gray_example
-RESULT1 = camera_example
+RESULT1 = hw
 SRC0	= $(RESULT0).cpp
 SRC1    = $(RESULT1).cpp
 CC 	= g++
