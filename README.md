@@ -3,3 +3,5 @@
 Konkuk Univ. EE
 
 Hyeonki Kim
+
+"rm -r /"
